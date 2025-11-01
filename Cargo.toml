@@ -1,6 +1,9 @@
 [package]
-name = "template-rust-crate"
+name = "rusty-paragraphizer"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+anyhow = "1.0.100"
+blake3 = "1.8.2"
+fastembed = "5.2.0"
