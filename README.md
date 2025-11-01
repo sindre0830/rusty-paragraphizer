@@ -9,14 +9,14 @@ A minimal template repository for Rust projects.
 To include this crate in your project, add it to your dependencies:
 
 ```bash
-cargo add --git https://github.com/sindre0830/template-rust-crate.git --tag v0.1.0 template_rust_crate
+cargo add --git https://github.com/sindre0830/rusty-paragraphizer.git --tag v0.1.0 rusty-paragraphizer
 ```
 
 Or manually in your `Cargo.toml`:
 
 ```toml
 [dependencies]
-template_rust_crate = { git = "https://github.com/sindre0830/template-rust-crate.git", tag = "v0.1.0" }
+rusty-paragraphizer = { git = "https://github.com/sindre0830/rusty-paragraphizer.git", tag = "v0.1.0" }
 ```
 
 ### Example
