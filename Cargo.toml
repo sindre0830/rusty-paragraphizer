@@ -7,3 +7,4 @@ edition = "2024"
 anyhow = "1.0.100"
 blake3 = "1.8.2"
 fastembed = "5.2.0"
+rusty-embeddings = { git = "https://github.com/sindre0830/rusty-embeddings.git", tag = "v0.1.0", version = "0.1.0" }
