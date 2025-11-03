@@ -1,10 +1,10 @@
 use anyhow::Result;
-use fastembed::{EmbeddingModel, InitOptions, TextEmbedding};
+use fastembed::EmbeddingModel;
+use rusty_embeddings::EmbeddingService;
 use std::{
     fs,
     io::{BufRead, BufReader, Write},
-    path::{Path, PathBuf},
-    sync::OnceLock,
+    path::PathBuf,
 };
 
 #[derive(Debug, Clone)]
@@ -44,31 +44,6 @@ impl Default for GroupParams {
             block_depth: 2,
             cache_dir: PathBuf::from(".cache"),
         }
-    }
-}
-
-/// internal static embedding engine using FastEmbed
-pub struct EmbeddingEngine;
-
-impl EmbeddingEngine {
-    fn instance(cache_dir: &Path) -> &'static std::sync::Mutex<TextEmbedding> {
-        static INSTANCE: OnceLock<std::sync::Mutex<TextEmbedding>> = OnceLock::new();
-        INSTANCE.get_or_init(|| {
-            let mut options = InitOptions::default();
-            options.model_name = EmbeddingModel::GTEBaseENV15;
-            options.show_download_progress = false;
-            options.cache_dir = cache_dir.join(".fastembed_cache").to_path_buf();
-            let embedding =
-                TextEmbedding::try_new(options).expect("failed to initialize FastEmbed model");
-            std::sync::Mutex::new(embedding)
-        })
-    }
-
-    pub fn embed(sentences: &[String], cache_dir: &Path) -> Result<Vec<Vec<f32>>> {
-        let model = Self::instance(cache_dir);
-        let mut guard = model.lock().unwrap();
-        let embeddings = guard.embed(sentences.to_vec(), None)?;
-        Ok(embeddings)
     }
 }
 
@@ -122,7 +97,11 @@ impl ParagraphGrouper {
             return Ok(hit);
         }
 
-        let embeddings = EmbeddingEngine::embed(&sentences, &self.params.cache_dir)?;
+        let embeddings = EmbeddingService::new()
+            .model(EmbeddingModel::GTEBaseENV15)
+            .cache_dir(self.params.cache_dir.clone())
+            .build(sentences.clone())?;
+
         let paragraphs = group_impl_c99(&sentences, embeddings, &self.params)?;
 
         let _ = persist_paragraphs_cache(&self.params, &sentences, &paragraphs);
